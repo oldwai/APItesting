@@ -7,12 +7,17 @@
 @time: 2018/3/21 17:59
 """
 import base64
+import datetime
 
 import requests
 import time
 from common.common import CommonMethod
 
 shopping_api_url = 'http://192.168.1.122:8881/shopping2'
+CABIN = "Economy"
+NOWDATE = (datetime.datetime.now() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+PARENT_ID = 'RksVSX7PfZm1yF04adBWYsCD7M4='
+PARENT_KEY = 'NjU2OTJiMjAwMTMzY2RkOTg4OWMyY2NkNTg4ODRlOTg='
 
 
 class Shopping(CommonMethod):
@@ -34,15 +39,45 @@ class Shopping(CommonMethod):
         return res.text
 
 
-def shopping(para):
+def shopping(**kwargs):
+    para = compose_para(**kwargs)
     result = Shopping.shopping(para)
     return result
 
-def search():
-    pass
+
+def compose_para(origin='SIN', destination='HEL', parent_id=PARENT_ID, parent_key=PARENT_ID, adults=1, children=0,
+                 airline=None, nonstop=0, cabin=CABIN, departure_date=NOWDATE):
+    shopping_data = {
+        "authentication": {
+            "partnerId": parent_id,
+            "sign": CommonMethod.sign_md5(parent_id, parent_key)
+        },
+        "search": {
+            "adults": adults,
+            "airline": airline,
+            "children": children,
+            "nonstop": nonstop,
+            "searchAirLegs": [
+                {
+                    "cabinClass": cabin,
+                    "departureDate": departure_date,
+                    "destination": destination,
+                    "origin": origin
+                }
+                # },
+                # {
+                #     "cabinClass": "Economy",
+                #     "departureDate": "2018-12-24",
+                #     "destination": "MEX",
+                #     "origin": "LAX"
+                # }
+            ]
+        }
+    }
+    return shopping_data
 
 
-def searchAirLegs():
+def search_air_legs():
     pass
 
 
@@ -53,12 +88,14 @@ def shopping_data_case(authentication, search, request_para=None):
     request_para["search"] = search
 
 
-
-
-
 if __name__ == '__main__':
     parent_id = 'RksVSX7PfZm1yF04adBWYsCD7M4='
     parent_key = 'NjU2OTJiMjAwMTMzY2RkOTg4OWMyY2NkNTg4ODRlOTg='
+    origin_loc = 'HKG'
+    jounarys = shopping()
+    print(jounarys)
+
+'''
     ow_data = {
         "authentication": {
             "partnerId": parent_id,
@@ -76,18 +113,18 @@ if __name__ == '__main__':
                     "destination": "HEL",
                     "origin": "BJS"
                 }
-                # },
-                # {
-                #     "cabinClass": "Economy",
-                #     "departureDate": "2018-12-24",
-                #     "destination": "MEX",
-                #     "origin": "LAX"
-                # }
+                },
+                {
+                    "cabinClass": "Economy",
+                    "departureDate": "2018-12-24",
+                    "destination": "MEX",
+                    "origin": "LAX"
+                }
             ]
         }
     }
-    jounarys = shopping(ow_data)
-    print(jounarys)
+'''
+
     # for i in range(1,31):
     #     res = shopping(ow_data)
     #     journeys = len(res['data']['journeys'])
