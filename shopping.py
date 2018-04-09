@@ -10,15 +10,19 @@ import base64
 
 import requests
 import time
-from APItesting.common.common import CommonMethod
+from common.common import CommonMethod
+
+shopping_api_url = 'http://192.168.1.122:8881/shopping2'
 
 
 class Shopping(CommonMethod):
     def get_url(self):
+        pass
 
-    def shopping(self, para, host='http://192.168.1.122:8881/shopping2'):
+    @classmethod
+    def shopping(cls, para, host=shopping_api_url):
         print(para)
-        para = para_encryption_base64(para)
+        para = CommonMethod.para_encryption_base64(para)
         para = para.decode('utf-8')
         url = host + '?param=' + para
         try:
@@ -26,31 +30,60 @@ class Shopping(CommonMethod):
         except Exception as e:
             print(e)
         # res = res.json()
+        # return res.json()
         return res.text
 
 
+def shopping(para):
+    result = Shopping.shopping(para)
+    return result
+
+def search():
+    pass
+
+
+def searchAirLegs():
+    pass
+
+
+def shopping_data_case(authentication, search, request_para=None):
+    if request_para is None:
+        request_para = {}
+    request_para["authentication"] = authentication
+    request_para["search"] = search
+
+
+
+
+
 if __name__ == '__main__':
-    parentid = 'RksVSX7PfZm1yF04adBWYsCD7M4='
-    parentkey = 'NjU2OTJiMjAwMTMzY2RkOTg4OWMyY2NkNTg4ODRlOTg='
+    parent_id = 'RksVSX7PfZm1yF04adBWYsCD7M4='
+    parent_key = 'NjU2OTJiMjAwMTMzY2RkOTg4OWMyY2NkNTg4ODRlOTg='
     ow_data = {
         "authentication": {
-            "partnerId": parentid,
-            "sign": sign_md5(parentid, parentkey)
+            "partnerId": parent_id,
+            "sign": CommonMethod.sign_md5(parent_id, parent_key)
         },
         "search": {
             "adults": 1,
-            "airline": "",
+            "airline": "QR",
             "children": 0,
-            "nonstop": 1,
+            "nonstop": 0,
             "searchAirLegs": [
                 {
                     "cabinClass": "Economy",
-                    "departureDate": "2018-04-27",
-                    "destination": "MEL",
-                    "origin": "HKG"
+                    "departureDate": "2018-12-24",
+                    "destination": "HEL",
+                    "origin": "BJS"
                 }
-            ],
-            "solutions": 20
+                # },
+                # {
+                #     "cabinClass": "Economy",
+                #     "departureDate": "2018-12-24",
+                #     "destination": "MEX",
+                #     "origin": "LAX"
+                # }
+            ]
         }
     }
     jounarys = shopping(ow_data)
